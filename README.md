@@ -12,10 +12,10 @@ An **agent skill** that automates the App Store release-notes pipeline — from 
 
 - **Commit-driven** — analyzes the git history between two tags and groups changes into features, fixes, and maintenance.
 - **User-facing polish** — rewrites developer-oriented output (no "refactor", "migration", "enum") into concise, benefit-focused release notes.
-- **29 languages** in `ChangeLog`, **16 App Store locales** in metadata — kept in a consistent, documented order.
+- **Flexible language coverage** — the language set is derived from your repository's existing `ChangeLog` blocks and metadata locale files, not hardcoded. Works with 1 language or 50 (reference default: 29 ChangeLog languages, 16 App Store locales).
 - **Safe by default** — every remote change is dry-run previewed first and requires explicit user confirmation; `--allow-deletes` is never used unless asked.
 - **Timeout-resilient** — recovers cleanly from `asc` timeouts without assuming partial rollback.
-- **Source-driven translation** — Simplified Chinese is the canonical source; English is the primary translation target.
+- **Source-driven translation** — the source language is read from your repo conventions (Simplified Chinese by default); English is the primary translation target.
 
 ## How it works
 
@@ -76,6 +76,17 @@ The skill assumes the consuming app repo follows these conventions:
 - `AppStoreConnect/metadata/app-info/` — app-level metadata (name, subtitle, privacy policy URL)
 - For a new version, metadata is copied from the previous version and **only `whatsNew` is updated**, unless the user explicitly asks to change other fields.
 
+### Language configuration
+
+The skill does **not** hardcode a fixed language list. It derives the language set from your repository each run:
+
+- **ChangeLog languages** — read from the previous version block's `## <language>` headings (names and order are preserved exactly).
+- **App Store locales** — read from the actual `<locale>.json` files of the previous version directory.
+- `ChangeLog` and metadata locales are independent sets: your ChangeLog may have more (or fewer) languages than your App Store locales, and the skill never adds or removes locale files on its own.
+- Source language defaults to `zh-Hans`; confirm with the skill if your project uses another source.
+
+The original project uses 29 ChangeLog languages and 16 metadata locales as its reference configuration.
+
 ## Usage
 
 Trigger the skill with a natural-language request, for example:
@@ -86,10 +97,10 @@ The skill will:
 
 1. Find the latest git tag and determine the commit range.
 2. Run `python3 scripts/generate_changelog.py <start> HEAD "<version>"` for a raw changelog.
-3. Polish the raw output into user-facing release notes (source language: `zh-Hans`).
-4. Translate into all 29 `ChangeLog` languages.
+3. Polish the raw output into user-facing release notes (source language from your repo conventions, `zh-Hans` by default).
+4. Translate into every language in the derived ChangeLog language set.
 5. Insert the new version block at the top of `ChangeLog`.
-6. Create `AppStoreConnect/metadata/version/<version>/` (copied from the previous version) and update only `whatsNew` in all 16 locales.
+6. Create `AppStoreConnect/metadata/version/<version>/` (copied from the previous version) and update only `whatsNew` in every locale file.
 7. Validate locally: `asc metadata validate --dir ./AppStoreConnect/metadata --output table`.
 8. Dry-run the push: `asc metadata push --app "$ASC_APP_ID" --version <v> --platform IOS --dir ... --dry-run`.
 9. Apply the push **only after explicit user confirmation**.

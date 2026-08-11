@@ -25,13 +25,29 @@ Use this skill when asked to generate release notes, update ChangeLog, prepare A
 - `whatsNew` in metadata must be concise (one paragraph, semicolons separating items).
 - Raw commit analysis script: `scripts/generate_changelog.py` (relative to this skill's directory; developer-oriented output).
 
-## Language lists
+## Language configuration
 
-### ChangeLog (29 languages, keep this order)
+Language coverage is **derived from the consuming repository**, not hardcoded. Different apps need different language sets — use the lists below only as a reference default, and always verify against the repo itself.
+
+### 1. Derive the actual language set from the repo
+
+- **ChangeLog languages**: read the previous complete version block in `ChangeLog` and mirror its `## <language>` headings exactly (names and order).
+- **App Store locales**: list the actual `<locale>.json` files under `AppStoreConnect/metadata/version/<prev-version>/`.
+- If the repo has no existing entries (first run), ask the user which languages/locales they need.
+
+### 2. Rules that always apply
+
+- Keep the derived language order identical to the previous version block — do not reorder.
+- Keep App Store locale coverage identical to the previous version — do not add or remove locale files based on the ChangeLog language list. `ChangeLog` may have more languages than the metadata locales (or fewer); they are independent sets.
+- Source language is `zh-Hans` (Simplified Chinese) by default; confirm with the user if their project uses a different source.
+
+### Reference default (from the original project)
+
+**ChangeLog (29 languages, in this order):**
 
 `中文`, `English`, `日本語`, `한국어`, `Tiếng Việt`, `Deutsch`, `Français`, `Italiano`, `Русский`, `Polski`, `Nederlands`, `Svenska`, `ไทย`, `Bahasa Indonesia`, `Українська`, `Español`, `Português`, `Čeština`, `Magyar`, `Română`, `Hrvatski`, `Srpski`, `Slovenski`, `Ελληνικά`, `Türkçe`, `العربية`, `עברית`, `हिन्दी`, `中文（繁體）`
 
-### App Store metadata (16 locales)
+**App Store metadata (16 locales):**
 
 `zh-Hans.json`, `en-US.json`, `ja.json`, `ko.json`, `vi.json`, `de-DE.json`, `fr-FR.json`, `it.json`, `ru.json`, `pl.json`, `nl-NL.json`, `sv.json`, `th.json`, `id.json`, `uk.json`, `es-ES.json`
 
@@ -74,7 +90,7 @@ Rewrite the raw developer-oriented output into concise, user-facing release note
 
 ### 4. Read ChangeLog and translate to all languages
 
-Read the latest version block in `ChangeLog` to preserve language order and headings. Translate from Chinese source into every ChangeLog language.
+Read the latest version block in `ChangeLog` to preserve language order and headings. Translate from the source language (Chinese by default) into **every language present in the derived language set** (see [Language configuration](#language-configuration)).
 
 **Common translation keywords:**
 - 修复 → Fixed / 修正 / 수정 / Risolto / Corrigido / etc.
@@ -113,7 +129,7 @@ mkdir -p AppStoreConnect/metadata/version/<new-version>
 cp AppStoreConnect/metadata/version/<prev-version>/*.json AppStoreConnect/metadata/version/<new-version>/
 ```
 
-Update only `whatsNew` in each locale file. Condense the ChangeLog Chinese entry into one paragraph with semicolons.
+Update only `whatsNew` in each locale file (one per metadata locale, see [Language configuration](#language-configuration)). Condense the ChangeLog source-language entry into one paragraph with semicolons.
 
 ```python
 # Example whatsNew style:
@@ -185,7 +201,7 @@ Use `--app-info "APP_INFO_ID"` if the app has multiple app-info records.
 ## Quality checklist
 
 - [ ] Release notes polished for end users, not developers
-- [ ] All 29 languages present in ChangeLog, all 16 locale files in metadata
+- [ ] ChangeLog contains every language from the previous version block; metadata locale files match the previous version exactly
 - [ ] `whatsNew` is concise enough for App Store display limits
 - [ ] Metadata files only modified `whatsNew`, all other fields preserved
-- [ ] Source language (Chinese) is written first and used as basis for translations
+- [ ] Source language (Chinese by default) is written first and used as basis for translations
