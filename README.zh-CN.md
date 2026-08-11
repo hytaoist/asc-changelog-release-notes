@@ -45,8 +45,10 @@ asc auth login                    # 交互式，存入钥匙串
 export ASC_KEY_ID=...
 export ASC_ISSUER_ID=...
 export ASC_PRIVATE_KEY_PATH=...
-export ASC_APP_ID=6758697856      # 技能使用的默认应用 ID
+export ASC_APP_ID=<你的应用ID>      # 你自己的 App Store Connect 应用 ID
 ```
+
+> 请将 `<你的应用ID>` 替换为**你自己应用**的数字 ID（在 App Store Connect → 你的应用 → App 信息 → Apple ID 中查找）。示例中仅使用占位符，请勿复制其他项目的值。
 
 ## 安装
 

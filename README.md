@@ -45,8 +45,10 @@ asc auth login                    # interactive; stores in keychain
 export ASC_KEY_ID=...
 export ASC_ISSUER_ID=...
 export ASC_PRIVATE_KEY_PATH=...
-export ASC_APP_ID=6758697856      # default app ID used by the skill
+export ASC_APP_ID=<your-app-id>   # your own App Store Connect app ID
 ```
+
+> Replace `<your-app-id>` with the numeric App ID of **your** app (find it in App Store Connect → your app → App Information → Apple ID). The example above uses a placeholder only — do not copy values from other projects.
 
 ## Installation
 
