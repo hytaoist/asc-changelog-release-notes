@@ -69,12 +69,17 @@ ln -s "$PWD/asc-changelog-release-notes" ~/.agents/skills/asc-changelog-release-
 
 ## 仓库约定
 
-技能假定使用方应用仓库遵循以下约定：
+技能假定使用方应用仓库遵循以下约定（缺失部分会优雅处理——见下文）：
 
-- `ChangeLog` — 位于仓库根目录的面向用户的多语言发布历史
+- `ChangeLog` — 位于仓库根目录的面向用户的多语言发布历史（**可选**；没有它技能也能工作）
 - `AppStoreConnect/metadata/version/<版本>/<地区>.json` — 各版本的 App Store 元数据
 - `AppStoreConnect/metadata/app-info/` — 应用级元数据（名称、副标题、隐私政策 URL）
 - 新版本元数据从上一版本复制，**仅更新 `whatsNew`**，除非用户明确要求修改其他字段。
+
+### 文件缺失（首次采用）
+
+- **没有 `ChangeLog`** — 技能会询问是创建一份（推荐：以你的源语言 + 推导出的 App Store 地区作为初始语言）还是跳过 ChangeLog 步骤、仅产出元数据。技能不会假定文件存在，不会静默创建，也不会未经许可改动其他变更日志文件（如 `CHANGELOG.md`）。
+- **没有 `AppStoreConnect/metadata`** — 技能会要求你先运行 `asc metadata pull` 使本地元数据以远端为准，或手动指定地区。
 
 ### 语言配置
 

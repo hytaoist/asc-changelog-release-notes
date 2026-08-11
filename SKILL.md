@@ -15,7 +15,9 @@ Use this skill when asked to generate release notes, update ChangeLog, prepare A
 
 ## Repository conventions
 
-- Human-facing release history lives in `ChangeLog`.
+These are the conventions this skill is designed around. Missing files are handled gracefully (see [Missing files](#1b-missing-changelog-or-metadata-files)) — the skill can still produce metadata-only releases.
+
+- Human-facing release history lives in `ChangeLog` (recommended; optional — may not exist in all repos).
 - App Store Connect canonical metadata lives in `AppStoreConnect/metadata`.
 - Version release notes live under `AppStoreConnect/metadata/version/<version>/<locale>.json`.
 - For a new version, copy the previous version's locale JSON files and update only `whatsNew` unless the user explicitly asks to change description, keywords, URLs, or other metadata.
@@ -34,6 +36,13 @@ Language coverage is **derived from the consuming repository**, not hardcoded. D
 - **ChangeLog languages**: read the previous complete version block in `ChangeLog` and mirror its `## <language>` headings exactly (names and order).
 - **App Store locales**: list the actual `<locale>.json` files under `AppStoreConnect/metadata/version/<prev-version>/`.
 - If the repo has no existing entries (first run), ask the user which languages/locales they need.
+
+### 1b. Missing `ChangeLog` or metadata files
+
+The skill must still work when the repo lacks these files (e.g., first-time adoption):
+
+- **No `ChangeLog`**: check whether the repo uses a different changelog file/documentation pattern first. If none exists, ask the user whether to create a new `ChangeLog` (recommended) with the source language + the derived App Store locales as its initial languages — or to skip the ChangeLog step entirely and only produce metadata. Never invent a file that does not exist without user confirmation; also never overwrite another existing changelog-style file (e.g. `CHANGELOG.md`) without explicit permission.
+- **No `AppStoreConnect/metadata`**: ask the user to either run `asc metadata pull` first (recommended — see [Download before editing](#download-before-editing)) so local metadata starts from the remote source of truth, or specify the locales manually. Create the directory structure from the pulled/copied files only.
 
 ### 2. Rules that always apply
 
@@ -90,7 +99,7 @@ Rewrite the raw developer-oriented output into concise, user-facing release note
 
 ### 4. Read ChangeLog and translate to all languages
 
-Read the latest version block in `ChangeLog` to preserve language order and headings. Translate from the source language (Chinese by default) into **every language present in the derived language set** (see [Language configuration](#language-configuration)).
+Read the latest version block in `ChangeLog` (if present) to preserve language order and headings. Translate from the source language (Chinese by default) into **every language present in the derived language set** (see [Language configuration](#language-configuration)). If the repo has no `ChangeLog`, follow the fallback in [Missing files](#1b-missing-changelog-or-metadata-files).
 
 **Common translation keywords:**
 - 修复 → Fixed / 修正 / 수정 / Risolto / Corrigido / etc.
@@ -104,7 +113,7 @@ Read the latest version block in `ChangeLog` to preserve language order and head
 
 ### 5. Update ChangeLog file
 
-Insert the new version block BEFORE the current latest version (at top of file). Format:
+If the file exists: insert the new version block BEFORE the current latest version (at top of file). If it does not exist and the user confirmed creating one, create it with the first version block. Format:
 
 ```
 # 版本 <version>    （<date>）

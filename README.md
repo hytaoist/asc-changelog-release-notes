@@ -69,12 +69,17 @@ ln -s "$PWD/asc-changelog-release-notes" ~/.agents/skills/asc-changelog-release-
 
 ## Repository conventions
 
-The skill assumes the consuming app repo follows these conventions:
+The skill assumes the consuming app repo follows these conventions (missing pieces are handled gracefully — see below):
 
-- `ChangeLog` — human-facing, multi-language release history at the repo root
+- `ChangeLog` — human-facing, multi-language release history at the repo root (**optional**; the skill works without it)
 - `AppStoreConnect/metadata/version/<version>/<locale>.json` — per-version App Store metadata
 - `AppStoreConnect/metadata/app-info/` — app-level metadata (name, subtitle, privacy policy URL)
 - For a new version, metadata is copied from the previous version and **only `whatsNew` is updated**, unless the user explicitly asks to change other fields.
+
+### Missing files (first-time adoption)
+
+- **No `ChangeLog`** — the skill asks whether to create one (recommended: seed it with your source language + derived App Store locales) or skip the ChangeLog step and produce metadata only. It never assumes a file exists, never invents one silently, and never touches a different changelog file (e.g. `CHANGELOG.md`) without permission.
+- **No `AppStoreConnect/metadata`** — the skill asks you to run `asc metadata pull` first so local metadata starts from the remote source of truth, or to specify locales manually.
 
 ### Language configuration
 
